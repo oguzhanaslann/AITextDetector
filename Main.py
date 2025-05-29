@@ -35,7 +35,7 @@ def create_train_dataset():
 def create_test_and_validation_dataset():
     validation_dataset_loader = HumanAiGeneratedTextLoader()
     validation_dataset_loader.load_dataset()
-    test_and_validation_datasets = validation_dataset_loader.use_last_percent(0.1)
+    test_and_validation_datasets = validation_dataset_loader.use_last_percent(0.01)
     transformed_test_and_validation_datasets = validation_dataset_loader.transform_dataset(test_and_validation_datasets)
     print(transformed_test_and_validation_datasets)
     half_percent = 0.5
@@ -55,6 +55,8 @@ def create_test_and_validation_dataset():
     print("Test dataset saved successfully to data/test_dataset.csv")
 
 if __name__ == "__main__":
-    create_train_dataset()
-    create_test_and_validation_dataset()
-
+    from datasets import load_from_disk
+    tokenized_training_dataset = load_from_disk("data/tokenized_training")
+    tokenized_validation_dataset = load_from_disk("data/tokenized_validation")
+    print(tokenized_training_dataset)
+    print(tokenized_validation_dataset)
