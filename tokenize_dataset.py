@@ -1,4 +1,4 @@
-from transformers import RobertaTokenizer, RobertaForSequenceClassification
+from transformers import RobertaTokenizerFast, RobertaForSequenceClassification
 import pandas as pd
 import datasets
 
@@ -6,7 +6,11 @@ def map_labels_of_dataframe(frame, label2id):
   frame["label"] = frame["label"].map(label2id)
   return frame
 
-def tokenize_function(examples, tokenizer):
+model_name = "roberta-base"
+
+tokenizer = RobertaTokenizerFast.from_pretrained(model_name) # Python-based
+
+def tokenize_function(examples):
     return tokenizer(examples["text"], padding="max_length", truncation=True)
 
 def tokenize_datasets_and_save_to_disk():
@@ -28,12 +32,11 @@ def tokenize_datasets_and_save_to_disk():
 
     # Convert to Hugging Face Dataset
     training_dataset = datasets.Dataset.from_pandas(training_dataframe)
+    tokenized_training_datasets = training_dataset.map(tokenize_function, batched=True)
+    tokenized_validation_datasets = validation_dataset.map(tokenize_function, batched=True)
 
-    model_name = "roberta-base"
+    tokenized_training_datasets.save_to_disk("data/tokenized_training")
+    tokenized_validation_datasets.save_to_disk("data/tokenized_validation")
 
-    tokenizer = RobertaTokenizer.from_pretrained(model_name) # Python-based
-    tokenized__training_datasets = training_dataset.map(tokenize_function, batched=True)
-    tokenized__validation_datasets = validation_dataset.map(tokenize_function, batched=True)
-
-    tokenized__training_datasets.save_to_disk("data/tokenized_training")
-    tokenized__validation_datasets.save_to_disk("data/tokenized_validation")
+if __name__ == "__main__":
+    tokenize_datasets_and_save_to_disk()
