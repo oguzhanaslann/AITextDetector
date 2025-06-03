@@ -1,7 +1,7 @@
 from datasets import load_dataset
 import util
 from abc import ABC, abstractmethod
-from datasets import Dataset
+from datasets import Dataset, Features, Value
 
 class DatasetLoader(ABC):
     def __init__(
@@ -50,3 +50,11 @@ class DatasetLoader(ABC):
     
     def getRowLabel(self, label):
         return util.getLabelText(label)
+    
+    def cast_features(self, dataset):
+        """Ensure dataset features are in text-label order with string labels"""
+        features = Features({
+            'text': Value('string'),
+            'label': Value('string')  # Using string type for labels
+        })
+        return dataset.cast(features)

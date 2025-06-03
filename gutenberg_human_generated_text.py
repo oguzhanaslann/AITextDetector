@@ -1,28 +1,29 @@
 from dataset_loader import DatasetLoader
-import util
+from util import HUMAN_LABEL
 
-class HumanVsAiDatasetLoader(DatasetLoader):
+
+class GutenbergHumanGeneratedTextLoader(DatasetLoader):
     def __init__(self):
-        print("\n=== Initializing HumanVsAiDatasetLoader ===")
-        super().__init__('shahxeebhassan/human_vs_ai_sentences', 'train')
-        print(f"Dataset source: shahxeebhassan/human_vs_ai_sentences")
+        print("\n=== Initializing GutenbergHumanGeneratedTextLoader ===")
+        super().__init__("AlekseyKorshuk/ai-detection-gutenberg-human", "train")
+        print(f"Dataset source: AlekseyKorshuk/ai-detection-gutenberg-human")
 
     def preprocess_dataset(self, row):
-        processed_row = {
-            'text': self.getRowText(row['text']),
-            'label': self.getRowLabel(row['label'])
-        }
+        processed_row = {"text": self.getRowText(row["human"]), "label": HUMAN_LABEL}
         return processed_row
-    
+
     def get_preprocessed_dataset(self):
-        print("\n=== Loading Human vs AI Dataset ===")
         self.load_dataset()
         dataset = self.get_dataset()
         print(f"Raw dataset size: {dataset.num_rows} rows")
         print("Dataset features:", dataset.features)
         print("\n=== Preprocessing Dataset ===")
         print("Applying preprocessing with 4 processes...")
-        processed_dataset = dataset.map(self.preprocess_dataset, num_proc=4)
+        processed_dataset = dataset.map(
+            self.preprocess_dataset,
+            remove_columns=dataset.column_names,
+            num_proc=4,
+        )
         processed_dataset = self.cast_features(processed_dataset)
         print(f"Processed dataset size: {processed_dataset.num_rows} rows")
         print("Sample processed row:", processed_dataset[0])

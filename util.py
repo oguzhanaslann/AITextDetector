@@ -35,6 +35,7 @@ def preprocess_text(text):
     return text
 
 def getLabelText(label: int):
+    """Convert label to string format ('HUMAN' or 'AI')"""
     int_label = int(label)
     return AI_LABEL if int_label == 1 else HUMAN_LABEL
 
@@ -58,8 +59,8 @@ def ensure_proper_quotes(text: str) -> str:
     # Wrap the text in double quotes
     return f'"{text}"'
 
-AI_LABEL = "AI"
-HUMAN_LABEL = "HUMAN"
+AI_LABEL = "AI"  # String label
+HUMAN_LABEL = "HUMAN"  # String label
 
 
 def get_system_prompt():

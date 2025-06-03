@@ -1,35 +1,39 @@
 from dataset_loader import DatasetLoader
+from datasets import Dataset, Features, Value, ClassLabel
 import util
 
-class HumanAiGeneratedTextLoader(DatasetLoader):
+class UniqueAIHumanLoader(DatasetLoader):
     def __init__(self):
-        print("\n=== Initializing HumanAiGeneratedTextLoader ===")
-        super().__init__('dmitva/human_ai_generated_text', 'train')
-        print(f"Dataset source: dmitva/human_ai_generated_text")
-    
+        print("\n=== Initializing UniqueAIHumanLoader ===")
+        super().__init__(
+            dataset_name="humancert/unique_ai_human",
+            split_name="train"
+        )
+        print(f"Dataset source: humancert/unique_ai_human")
+        
     def preprocess_dataset(self, batch):
         print(f"Processing batch with {len(batch['human_text'])} pairs of texts")
         texts = []
         labels = []
-
+        
         for human_text, ai_text in zip(batch["human_text"], batch["ai_text"]):
             # Add human text
             texts.append(self.getRowText(human_text))
             labels.append(util.HUMAN_LABEL)
-
-            # Add AI text 
+            
+            # Add AI text
             texts.append(self.getRowText(ai_text))
             labels.append(util.AI_LABEL)
-
+        
         processed_batch = {
             "text": texts,
             "label": labels
         }
         print(f"Processed batch size: {len(texts)} examples")
         return processed_batch
-    
+
     def get_preprocessed_dataset(self, size):
-        print(f"\n=== Loading Human AI Generated Text Dataset ===")
+        print(f"\n=== Loading Unique AI Human Dataset ===")
         print(f"Requested dataset size: {size}")
         self.load_dataset(size=size)
         dataset = self.get_dataset()
@@ -37,7 +41,7 @@ class HumanAiGeneratedTextLoader(DatasetLoader):
         print("Dataset features:", dataset.features)
         print("\n=== Starting Dataset Transformation ===")
         return self.transform_dataset(dataset)
-
+    
     def transform_dataset(self, dataset):
         print("Transforming dataset with parallel processing (4 processes)")
         print("Original columns:", dataset.column_names)
@@ -51,4 +55,4 @@ class HumanAiGeneratedTextLoader(DatasetLoader):
         print(f"Transformed dataset size: {transformed_dataset.num_rows} rows")
         print("New columns:", transformed_dataset.column_names)
         print("Sample transformed row:", transformed_dataset[0])
-        return transformed_dataset
+        return transformed_dataset 

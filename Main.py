@@ -2,7 +2,9 @@ from human_vs_ai_dataset_loader import HumanVsAiDatasetLoader
 from human_ai_generated_text import HumanAiGeneratedTextLoader
 from datasets import concatenate_datasets, Dataset
 import util
-
+from ai_human_generated_text_loader import AIHumanGeneratedTextLoader
+from gutenberg_human_generated_text import GutenbergHumanGeneratedTextLoader
+from unique_ai_human_loader import UniqueAIHumanLoader
 
 def create_train_dataset():
     print("\n=== Loading Human vs AI Dataset ===")
@@ -54,9 +56,37 @@ def create_test_and_validation_dataset():
     test_dataset.to_csv("data/test_dataset.csv")
     print("Test dataset saved successfully to data/test_dataset.csv")
 
+def create_test_dataset():
+    print("\n=== Loading AI Human Generated Text Dataset ===")
+    ai_human_loader = AIHumanGeneratedTextLoader()
+    ai_human_dataset = ai_human_loader.get_preprocessed_dataset()
+    print(f"AI Human Dataset Size: {len(ai_human_dataset['text'])} rows")
+
+    print("\n=== Loading Gutenberg Dataset ===") 
+    gutenberg_loader = GutenbergHumanGeneratedTextLoader()
+    gutenberg_dataset = gutenberg_loader.get_preprocessed_dataset()
+    gutenberg_dataset = util.get_dataset_percent(gutenberg_dataset, 15000/gutenberg_dataset.num_rows)
+    print(f"Gutenberg Dataset Size: {len(gutenberg_dataset['text'])} rows")
+
+    print("\n=== Loading Unique AI Human Dataset ===")
+    unique_loader = UniqueAIHumanLoader()
+    unique_dataset = unique_loader.get_preprocessed_dataset(size=15000)
+    print(f"Unique AI Dataset Size: {unique_dataset.num_rows} rows")
+
+    print("\n=== Combining Datasets ===")
+    combined_dataset = concatenate_datasets([
+        Dataset.from_dict(ai_human_dataset),
+        Dataset.from_dict(gutenberg_dataset),
+        unique_dataset
+    ])
+    print(f"Combined Dataset Size: {combined_dataset.num_rows} rows")
+    print("Sample of Combined Dataset:")
+    print(combined_dataset[:2])
+    print("\nDataset Features:", combined_dataset.features)
+
+    print("\n=== Saving Combined Dataset ===")
+    combined_dataset.to_csv("data/test_15k_dataset.csv")
+    print("Dataset saved successfully to data/test_15k_dataset.csv")
+
 if __name__ == "__main__":
-    from datasets import load_from_disk
-    tokenized_training_dataset = load_from_disk("data/tokenized_training")
-    tokenized_validation_dataset = load_from_disk("data/tokenized_validation")
-    print(tokenized_training_dataset)
-    print(tokenized_validation_dataset)
+    create_test_dataset()
