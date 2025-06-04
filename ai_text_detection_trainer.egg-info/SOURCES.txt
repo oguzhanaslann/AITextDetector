@@ -1,0 +1,9 @@
+README.md
+setup.py
+ai_text_detection_trainer.egg-info/PKG-INFO
+ai_text_detection_trainer.egg-info/SOURCES.txt
+ai_text_detection_trainer.egg-info/dependency_links.txt
+ai_text_detection_trainer.egg-info/requires.txt
+ai_text_detection_trainer.egg-info/top_level.txt
+trainer/__init__.py
+trainer/task.py
